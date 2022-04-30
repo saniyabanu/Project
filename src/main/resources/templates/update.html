@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Job Details Update Page</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+  <link rel="stylesheet" href="./style.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+
+  <!-- Include Dexie -->
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
+
+<style>
+nav {
+	display: flex;
+	justify-content: space-around;
+	width: 100%;
+}
+
+ul {
+	list-style-type: none;
+	width: 90%;
+	font-size: large;
+}
+
+li {
+	float: left;
+	margin-right: 7%;
+}
+
+li a {
+	display: flex;
+	justify-content: space-around;
+	color: white;
+	padding: 14px 20px;
+	text-decoration: none;
+}
+
+li a:hover:not(.active) {
+	background-color: rgba(255, 156, 7, 0.813);
+	text-decoration: none;
+}
+
+.active {
+	background-color: #04AA6D;
+	text-decoration: none;
+}
+
+footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 97%;
+	margin-left: 1.5%;
+	margin-right: 1.5%;
+	color: white;
+	text-align: center;
+}
+select{
+	width:10%;
+	text-align:center;
+}
+
+</style>
+</head>
+
+
+<script >
+
+$.ajax({ url:"/jobdetails/", 
+	 success:function(data) { 
+		 var select='';
+		$.each( data, function(key,value) {
+	        select += '<option val=' + value.jobid + ' id="opsn">' + value.jobid + '</option>';
+			 console.log(value.jobid);			 
+		})
+		  $('#some_select').html(select);
+       },   
+
+	 type:'GET' 
+} 
+);
+
+function EditInfo(){
+	  $.ajax({url:"/jobdetails/"+$("#some_select").val(), 
+		  type:'GET',
+		  success:function(data) {
+			console.log(data);
+			    $('#id1').val(data.jobid);
+				$('#jobname1').val(data.jobname);
+				$('#jobtype1').val(data.jobtype);
+				$('#jobvacancy1').val(data.jobvacancy);
+				$('#jobdesc1').val(data.jobdesc);
+			}
+	  })
+}	  
+function updateData(){
+	var data = {}
+data["jobname"] = $("#jobname1").val();
+data["jobtype"] = $("#jobtype1").val();
+data["jobvacancy"] = $("#jobvacancy1").val();
+data["jobdesc"] = $("#jobdesc1").val();
+
+	$.ajax( {url:"http://localhost:7051/jobdetails/"+ $("#id1").val(), 
+		    contentType: "application/json",
+		    data: JSON.stringify(data), 
+			type:"put",
+			dataType: 'json',
+			success:function(resp, status){
+				console.log(resp+" "+ status);	
+				alert("Inserted");
+			}
+	});
+}
+</script>
+
+
+
+<body>
+
+<div class="container-fluid text-center">
+
+	
+	<nav class="navbar bg-dark">
+                <ul>
+                    <li><a class="active" th:href="@{/job}"><strong>JOB_ </strong><br><strong><em> Details</em></strong></a></li>
+                    <li><a th:href="@{/insert}">Insert</a></li>
+                    <li><a th:href="@{/update}">Update</a></li>
+                    <li><a th:href="@{/delete}">Delete</a></li>
+                    <li><a th:href="@{/display}">Display</a></li>
+                </ul>
+        </nav>
+	
+      <h1 class="bg-light py-4 text-info">
+        <i class="header"></i> <img src="one.png" alt="logo" />Welcome to Job Details
+      </h1>
+</div> 
+     
+ <center>  
+<label class="form-label">Job ID</label>
+<select id="some_select">
+
+</select><br>
+<button type="button" onclick="EditInfo()" class="btn btn-warning fas fa-edit" data-toggle="modal" data-target="#update1" >Show Details</button> 
+</center> 
+
+
+
+
+ <div class="d-flex justify-content-center">
+       <img style="width: 50%;"src="img1.jpg" alt="">
+      </div>  
+<!-- Modal -->
+<div class="modal fade" id="update1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">  Update Page</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <input type="text" id="id1" name="id" class="form-control" autocomplete="off" placeholder="Job ID" readonly/><br>
+          <input type="text" id="jobname1" name="jobname" class="form-control" autocomplete="off" placeholder="job Name" /><br>
+          <input type="text" id="jobtype1" name="jobtype" class="form-control" autocomplete="off" placeholder="job Type" /><br>
+          <input type="text" id="jobvacancy1" name="jobvacancy" class="form-control " autocomplete="off" placeholder="job vacancy" /><br>
+          <input type="text" id="jobdesc1" name="jobdesc" class="form-control " autocomplete="off" placeholder="job Desc" /><br>
+          <input style="margin-left: 10%; margin-right: 10%;" type="submit" value="update" class="btn btn-warning"  onclick='updateData();'/><br>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal End -->
+
+</body>
+</html>

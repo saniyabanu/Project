@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Job Details Delete Page</title>
+
+
+
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous" />
+
+<link rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+	integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="./style.css" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+	integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+	crossorigin="anonymous">
+	
+</script>
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous">
+	
+</script>
+
+<!-- Include Dexie -->
+<script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
+<style>
+nav {
+	display: flex;
+	justify-content: space-around;
+	width: 100%;
+}
+
+ul {
+	list-style-type: none;
+	width: 90%;
+	font-size: large;
+}
+
+li {
+	float: left;
+	margin-right: 7%;
+}
+
+li a {
+	display: flex;
+	justify-content: space-around;
+	color: white;
+	padding: 14px 20px;
+	text-decoration: none;
+}
+
+li a:hover:not(.active) {
+	background-color: rgba(255, 156, 7, 0.813);
+	text-decoration: none;
+}
+
+.active {
+	background-color: #04AA6D;
+	text-decoration: none;
+}
+
+footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 97%;
+	margin-left: 1.5%;
+	margin-right: 1.5%;
+	color: white;
+	text-align: center;
+}
+.select{
+	width:10%;
+	text-align:center;
+}
+
+
+</style>
+
+
+</head>
+
+
+<script>
+	$.ajax({
+		url : "/jobdetails/",
+		success : function(data) {
+			var select = ''
+			$.each(data, function(key, value) {
+				select += '<option val=' + value.jobid + ' id="opsn">'
+						+ value.jobid + '</option>';
+				console.log(value.jobid);
+			})
+			$('#some_select').html(select);
+		},
+
+		type : 'GET'
+	});
+
+	function doconfirm() {
+		var c = confirm("are you sure to delete the record?");
+		if (c == true) {
+			$.ajax({
+				url : "http://localhost:7051/jobdetails/" + $("#some_select").val(),
+				type : 'delete',
+				success : function(response, status) {
+					console.log(status);
+				}
+			})
+		}
+	}
+</script>
+
+
+
+<body>
+
+	<div class="container-fluid text-center">
+		
+		<nav class="navbar bg-dark">
+				<ul>
+					<li><a class="active" th:href="@{/job}"><strong>JOB_
+						</strong><br>
+						<strong><em> Details</em></strong></a></li>
+					<li><a th:href="@{/insert}">Insert</a></li>
+					<li><a th:href="@{/update}">Update</a></li>
+					<li><a th:href="@{/delete}">Delete</a></li>
+					<li><a th:href="@{/display}">Display</a></li>
+				</ul>
+			</nav>
+		
+		<h1 class="bg-light py-4 text-info">
+			
+			<i class="header"></i> <img src="one.png" alt="logo" />Welcome to
+			Job Details
+		</h1>
+	</div>
+	<center>
+		<label class="form-label">Job ID</label> <select id="some_select"
+			class="form-select select"></select><br>
+		<button onclick="doconfirm()"
+			style="font-family: Monospace; font-size: 14px; color: black; font-weight: 700;"
+			class="btn btn-danger" id="btn-update">
+			<i class="fa fa-trash">Delete</i>
+		</button>
+	</center>
+	<div class="d-flex justify-content-center">
+		<img style="width: 50%;" src="img2.jpg" alt="">
+	</div>
+
+</body>
+</html>

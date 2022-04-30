@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Job Details Display Page</title>
+
+<style>
+nav {
+	display: flex;
+	justify-content: space-around;
+	width: 100%;
+}
+
+ul {
+	list-style-type: none;
+	width: 90%;
+	font-size: large;
+}
+
+li {
+	float: left;
+	margin-right: 7%;
+}
+
+li a {
+	display: flex;
+	justify-content: space-around;
+	color: white;
+	padding: 14px 20px;
+	text-decoration: none;
+}
+
+li a:hover:not(.active) {
+	background-color: rgba(255, 156, 7, 0.813);
+	text-decoration: none;
+}
+
+.active {
+	background-color: #04AA6D;
+	text-decoration: none;
+}
+
+footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 97%;
+	margin-left: 1.5%;
+	margin-right: 1.5%;
+	color: white;
+	text-align: center;
+}
+.select{
+	width:10%;
+	text-align:center;
+}
+
+
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+
+  <!-- Include Dexie -->
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
+  <script>
+  var currentPageIndex = 0;
+  var recordSize = 50;
+  var temp=0;
+  function Read(){
+	  $.ajax({ url:"/jobdetails/", 
+					 success:function(data) {
+						var jobdetail='';
+						var j=(currentPageIndex-temp) * recordSize;
+						if(j<data.length && j < (currentPageIndex-temp) * recordSize+ recordSize)
+							{
+								for (var i = (currentPageIndex-temp) * recordSize; i < data.length && i < (currentPageIndex-temp) * recordSize + recordSize; i++)
+						    	 {
+									jobdetail+='<tr>';
+									jobdetail+='<td>'+data[i].jobid+'</td>';
+									jobdetail+='<td>'+data[i].jobname+'</td>';
+									jobdetail+='<td>'+data[i].jobtype+'</td>';
+									jobdetail+='<td>'+data[i].jobvacancy+'</td>';
+									jobdetail+='<td>'+data[i].jobdesc+'</td>';
+									
+									jobdetail+='<td>'+'<button type="button" onclick="EditInfo('+data[i].jobid+')" class="btn btn-warning fas fa-edit" data-toggle="modal" data-target="#update" >'+'</button>'+'</td>';
+									jobdetail+='<td>'+'<button onclick="Delete('+data[i].jobid+')"style="font-family:Monospace;font-size:14px;color:black;font-weight:700;" class="btn btn-danger" id="btn-update" class="btn btn-danger">'+'<i class="fa fa-trash">'+'</i>'+'</button>'+'</td>';
+									jobdetail+='</tr>';					 
+								
+						    	 }
+								$('#tbody').html(jobdetail);
+							    $('.tbody').append('<tr><td colspan="5"><button style="margin-right: 10%;" class="btn btn-success fa fa-arrow-left" type="button" onclick="previousData();"></button></td><td colspan="4"><button style="margin-left: 80%;" class="btn btn-success fa fa-arrow-right" type="button" onclick="nextData();"></button></td></tr>');
+
+							}
+						else
+							{
+							 temp++;
+							}
+						
+					    },
+
+					 type:'GET', // POSt   PUT   DELETE  
+	       }); 
+  }
+
+  
+function nextData(){
+	currentPageIndex++;
+	Read();
+  }
+function previousData(){
+	currentPageIndex--;
+	Read();
+  }
+	 	
+
+  function Delete(jobid){
+  	var c= confirm("are you sure to delete the record?");
+  	if(c==true){
+  		$.ajax({url:"http://localhost:7051/"+jobid, type:'Delete',success:function(response,status){
+  			 console.log(status);
+  		  }	  
+  	})
+  	}
+  }
+
+	  function EditInfo(jobid){
+		  console.log(jobid);
+		  $.ajax({url:"/jobdetails/"+jobid, 
+			  type:'GET',
+			  success:function(data) {
+				console.log(data);
+				$('#id1').val(data.jobid);
+				$('#jobname1').val(data.jobname);
+				$('#jobtype1').val(data.jobtype);
+				$('#jobvacancy1').val(data.jobvacancy);
+				$('#jobdesc1').val(data.jobdesc);
+				}
+		  })
+	  }	  
+	  
+	  
+function Search(){
+		  $.ajax({ url:"/jobdetails/"+$("#ag").val(), 
+				 success:function(data) 
+				 {  
+				    var jobdetail=''; 
+				    jobdetail+='<tr>';
+				    jobdetail+='<td>'+data.jobid+'</td>';
+				    jobdetail+='<td>'+data.jobname+'</td>';
+				    jobdetail+='<td>'+data.jobtype+'</td>';
+				    jobdetail+='<td>'+data.jobvacancy+'</td>';
+				    jobdetail+='<td>'+data.jobdesc+'</td>';
+				   
+				    jobdetail+='<td>'+'<button type="button" onclick="EditInfo('+data.jobid+')" class="btn btn-warning fas fa-edit" data-toggle="modal" data-target="#update" >'+'</button>'+'</td>';
+				    jobdetail+='<td>'+'<button onclick="Delete('+data.jobid+')"style="font-family:Monospace;font-size:14px;color:black;font-weight:700;" class="btn btn-warning" id="btn-update" class="btn btn-danger">'+'<i class="fa fa-trash">'+'</i>'+'</button>'+'</td>';
+				    jobdetail+='</tr>';
+						console.log(data.jobname);
+						$('#tbody').html(jobdetail);
+	                },				 
+				 type:'GET' 
+			 } 
+		 	);
+
+	  }
+	
+function updateData(){
+		var data = {}
+		data["jobname"] = $("#jobname1").val();
+		data["jobtype"] = $("#jobtype1").val();
+		data["jobvacancy"] = $("#jobvacancy1").val();
+		data["jobdesc"] = $("#jobdesc1").val();
+	
+		$.ajax( {url:"/jobdetails/"+ $("#id1").val(), 
+			    contentType: "application/json",
+			    data: JSON.stringify(data), 
+				type:"put",
+				dataType: 'json',
+				success:function(resp, status){
+					console.log(resp+" "+ status);	
+					alert("Inserted");
+				}
+		});
+}
+  </script>
+</head>
+<body>
+ <div class="container-fluid text-center">
+ 	
+ 	<nav class="navbar bg-dark">
+				<ul>
+					<li><a class="active" th:href="@{/job}"><strong>JOB_
+						</strong><br>
+						<strong><em> Details</em></strong></a></li>
+					<li><a th:href="@{/insert}">Insert</a></li>
+					<li><a th:href="@{/update}">Update</a></li>
+					<li><a th:href="@{/delete}">Delete</a></li>
+					<li><a th:href="@{/display}">Display</a></li>
+				</ul>
+			</nav>
+ 	
+      <h1 class="bg-light py-4 text-info">
+        <i class="header"></i> <img src="one.png" alt="" />Welcome to Job Details
+      </h1>
+      <div>
+	 </div>
+      </div>  
+<a th:href="@{/insert}"><button style="margin:0% 80%;width:150px;margin-bottom:-4%"  class="btn btn-info add-new"><i class="fas fa-user-plus">Add New</i></button></a>  
+      
+<button style="margin:0% 10%;width:150px;" class="btn btn-primary   fas fa-users" onclick="Read()">View All</button>
+<center>
+<input  type="text" name="idname" id="ag" placeholder="job ID" />
+<button type="submit" class="btn btn-primary mb1 bg-teal fa fa-search" onclick="Search()">Search</button><br><br> 
+</center>	
+<!-- style="margin:0% 5%;width:150px;margin-bottom:-13%" --> 
+ <div class="d-flex table-data container-fluid">     
+ <table class="table table-hover  "  id="mytable"> 
+   <thead class="thead-dark">
+      <tr>
+      <th scope="col">Job ID</th>
+      <th scope="col">Job name</th>
+      <th scope="col">Job type</th>
+      <th scope="col">Job Vacancy</th>
+      <th scope="col">Job Description</th>
+     
+      <th colspan="2" style=" text-align: center;">Actions</th>      
+      </tr>
+    </thead>
+    <tbody id="tbody" class="tbody">
+    </tbody>
+  </table>
+  
+  </div>
+ 
+ 
+ 
+<!-- Modal -->
+<div class="modal fade" id="update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">  Update Page</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <input type="text" id="id1" name="id" class="form-control" autocomplete="off" placeholder="Job ID" readonly/><br>
+          <input type="text" id="jobname1" name="jobname" class="form-control" autocomplete="off" placeholder="job Name" /><br>
+          <input type="text" id="jobtype1" name="jobtype" class="form-control" autocomplete="off" placeholder="Job Type" /><br>
+          <input type="text" id="jobvacancy1" name="jobvacancy" class="form-control " autocomplete="off" placeholder="Job Vacancy" /><br>
+          <input type="text" id="jobdesc1" name="jobdesc" class="form-control " autocomplete="off" placeholder="Job Desc" /><br>
+          <input style="margin-left: 10%; margin-right: 10%;" type="submit" value="update" class="btn btn-warning"  onclick='updateData();'/><br>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal End -->
+
+</body>
+</html>
